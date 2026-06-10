@@ -1,4 +1,4 @@
-﻿"""
+"""
 Dataset statistics for VisDrone — analyze small-object distribution
 to calibrate hyperparameters (NWD threshold, RepLoss weights, etc.).
 """
