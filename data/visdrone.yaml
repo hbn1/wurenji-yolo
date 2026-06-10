@@ -1,0 +1,22 @@
+﻿# VisDrone2019 Dataset Configuration
+# YOLO format
+
+path: C:/Users/黄博阳/Desktop/CGHR-YOLOv8s/data/VisDrone
+train: train/images
+val: val/images
+
+# Number of classes
+nc: 10
+
+# Class names
+names:
+  0: pedestrian
+  1: people
+  2: bicycle
+  3: car
+  4: van
+  5: truck
+  6: tricycle
+  7: awning-tricycle
+  8: bus
+  9: motor

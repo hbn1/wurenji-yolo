@@ -1,0 +1,43 @@
+# YOLOv8s Baseline Training Config for VisDrone
+# Phase 0 ¡ª baseline establishment
+
+# Model
+model: yolov8s.pt             # COCO pretrained weights
+
+# Data
+data: data/visdrone.yaml      # VisDrone dataset yaml
+imgsz: 640                    # training image size
+
+# Training
+epochs: 50
+batch: 16                     # fits 8GB VRAM with 640x640
+workers: 4
+patience: 20                  # early stopping
+cos_lr: true
+close_mosaic: 8              # disable mosaic in last 15 epochs
+
+# Optimizer
+optimizer: AdamW
+lr0: 0.001                    # initial LR
+lrf: 0.01                     # final LR ratio
+weight_decay: 0.0005
+warmup_epochs: 3
+warmup_momentum: 0.8
+warmup_bias_lr: 0.1
+
+# Augmentation (standard YOLO)
+mosaic: 1.0
+mixup: 0.1
+copy_paste: 0.1
+hsv_h: 0.015
+hsv_s: 0.7
+hsv_v: 0.4
+degrees: 10.0
+translate: 0.1
+scale: 0.5
+flipud: 0.0
+fliplr: 0.5
+
+# Evaluation
+val: true
+save_period: 10
