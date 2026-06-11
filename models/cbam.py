@@ -6,16 +6,18 @@ class ChannelAttention(nn.Module):
     def __init__(self, channels, reduction=16):
         super().__init__()
         r = max(4, channels // reduction)
-        self.fc = nn.Sequential(
-            nn.AdaptiveAvgPool2d(1),
+        self.avg_pool = nn.AdaptiveAvgPool2d(1)
+        self.max_pool = nn.AdaptiveMaxPool2d(1)
+        self.mlp = nn.Sequential(
             nn.Conv2d(channels, r, 1, bias=False),
             nn.ReLU(inplace=True),
             nn.Conv2d(r, channels, 1, bias=False),
-            nn.Sigmoid(),
         )
+        self.sigmoid = nn.Sigmoid()
 
     def forward(self, x):
-        return x * self.fc(x)
+        attn = self.mlp(self.avg_pool(x)) + self.mlp(self.max_pool(x))
+        return x * self.sigmoid(attn)
 
 
 class SpatialAttention(nn.Module):
@@ -32,18 +34,12 @@ class SpatialAttention(nn.Module):
 
 
 class CBAM(nn.Module):
-    def __init__(self, *args, reduction=16, kernel_size=7):
+    def __init__(self, channels, reduction=16, kernel_size=7):
         super().__init__()
-        self.reduction = reduction
-        self.kernel_size = kernel_size
-        self.cam = None
-        self.sam = None
+        self.cam = ChannelAttention(channels, reduction)
+        self.sam = SpatialAttention(kernel_size)
 
     def forward(self, x):
-        if self.cam is None:
-            ch = x.shape[1]
-            self.cam = ChannelAttention(ch, self.reduction)
-            self.sam = SpatialAttention(self.kernel_size)
         x = self.cam(x)
         x = self.sam(x)
         return x

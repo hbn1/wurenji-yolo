@@ -21,6 +21,9 @@ env/
 
 # Model weights (can be re-downloaded)
 *.pt
+*.pth
+*.onnx
+*.engine
 
 # Datasets
 data/*/
@@ -31,6 +34,14 @@ runs/
 wandb/
 logs/
 *.log
+Ultralytics/
+YOLOv8/
+.claude/
+experiments/**/weights/
+experiments/**/events.out.tfevents.*
+experiments/**/train_batch*.jpg
+experiments/**/val_batch*_labels.jpg
+experiments/**/val_batch*_pred.jpg
 
 # Jupyter checkpoints
 .ipynb_checkpoints/

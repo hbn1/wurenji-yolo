@@ -26,6 +26,7 @@ def main():
         model_path = "yolov8s.pt"
         use_nwd, use_cbam = True, False
     else:
+        # Ablation C: CBAM yaml + pretrained weights
         model_path = os.path.join(os.path.dirname(os.path.dirname(__file__)),
                                    "configs", "cghr", "yolov8s_cbam.yaml")
         use_nwd, use_cbam = True, True
@@ -36,14 +37,24 @@ def main():
     print(f"  Epochs: {args.epochs}   Batch: {args.batch}   ImgSz: {args.imgsz}")
     print(f"{'='*60}\n")
 
+    # ---- Register CBAM if needed ----
     if use_cbam:
         from models.cghr_model import register_custom_modules
         register_custom_modules()
 
+    # ---- Inject NWD if needed (BEFORE model.train) ----
     if use_nwd:
         from models.nwd_inject import inject_nwd_loss
         inject_nwd_loss(area_threshold=1024.0, nwd_weight=0.25)
 
+    # ---- Build model ----
+    model = YOLO(model_path)
+
+    # ---- Load pretrained weights for CBAM model ----
+    if use_cbam and not args.resume:
+        from models.cghr_model import load_pretrained_for_cbam; load_pretrained_for_cbam(model.model, "yolov8s.pt")
+
+    # ---- Common training kwargs ----
     train_kwargs = {
         "data": data_yaml,
         "epochs": args.epochs,
@@ -65,7 +76,6 @@ def main():
         "patience": 10, "plots": True, "exist_ok": True,
     }
 
-    model = YOLO(model_path)
     results = model.train(**train_kwargs)
 
     print(f"\n[OK] Course Ablation {args.ablation} done.")
